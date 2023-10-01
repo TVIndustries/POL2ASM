@@ -1,6 +1,6 @@
 import os
 import numpy as np
-import cv2.cv2 as cv2
+import cv2
 from PIL import Image
 import struct
 
@@ -152,8 +152,8 @@ sp = '    '
 spD = sp + '#data '
 
 # Parameters
-game = 'MvC2_Custom'
-stgID = 'STG0A'
+game = 'MvC2'
+stgID = 'STG0F'
 directory = '.\\Files\\'
 pol_filename = stgID + 'POL.BIN'
 tex_filename = stgID + 'TEX.BIN'
@@ -321,8 +321,8 @@ fileList = []
 tex_file = open(directory + game_dir + tex_filename, 'rb')
 tFNS = tex_filename.split('.')
 zero = 0
-curFileHeader = 'TexID_0x{0:02X}-' + tFNS[0] + '-TexType_{1:s}-TexFmt_{2:s}.pvr'
-shortFileHeader = 'TexID_0x{0:02X}'
+curFileHeader = 'TexID_{0:03d}-' + tFNS[0] + '-TexType_{1:s}-TexFmt_{2:s}.pvr'
+shortFileHeader = 'TexID_{0:03d}'
 # print('(width, height, textureType, textureLocation)')
 #          [   P,    V,    R,    T,     E,     Z,    I,    S,     CF,     TF,   0x00, 0x00,     TH,  WID,    GHT,  HEI ]
 # type_0 = [0x50, 0x56, 0x52, 0x54,   0x08, 0x20, 0x00, 0x00,   0x01,   0x01,   0x00, 0x00,   0x40, 0x00,   0x40, 0x00 ]
@@ -420,12 +420,12 @@ if processZOrder:
                 elif colorFormat == '0x01':
                     data = int.from_bytes(fid.read(2), 'little')
                     r[wx][hy], b[wx][hy], g[wx][hy], alpha[wx][hy] = rgb565_to_rgba8888(data)
-                elif colorFormat == 'BGR565':
-                    data = int.from_bytes(fid.read(2), 'little')
-                    r[wx][hy], b[wx][hy], g[wx][hy], alpha[wx][hy] = bgr565_to_rgba8888(data)
                 elif colorFormat == '0x00':
                     data = int.from_bytes(fid.read(2), 'little')
                     r[wx][hy], b[wx][hy], g[wx][hy], alpha[wx][hy] = argb1555_to_rgba8888(data)
+                elif colorFormat == 'BGR565':
+                    data = int.from_bytes(fid.read(2), 'little')
+                    r[wx][hy], b[wx][hy], g[wx][hy], alpha[wx][hy] = bgr565_to_rgba8888(data)
                 elif colorFormat == 'YUV422':
                     data = int.from_bytes(fid.read(1), 'little')
                     r[wx][hy], b[wx][hy], g[wx][hy], alpha[wx][hy] = yuv2rgb(data)
@@ -477,7 +477,7 @@ if processZOrder:
 
         image_tga = Image.fromarray(cv2.cvtColor(flipped_rotated_image_vertical, cv2.COLOR_BGRA2RGBA))
         # image_tga.save(soloTexDir + shortName[0] + '.tga', format='TGA', transparency=0)
-        cv2.imwrite(soloTexDir + shortName[0] + '.png', flipped_rotated_image_vertical)
+        # cv2.imwrite(soloTexDir + shortName[0] + '.png', flipped_rotated_image_vertical)
         cv2.imwrite(convOutputDirectory + out_conv_filename + '.png', flipped_rotated_image_vertical)
 
         # Save the TGA file with alpha
@@ -491,6 +491,6 @@ for file in os.listdir(dirPath):
     try:
         img = Image.open(f"{dirPath}/{file}")
         r, g, b, a = img.split()
-        a.save(f"{file.split('.')[0]}-alpha.png")
+        a.save(f"{dirPath}/{file.split('.')[0]}-alpha.png")
     except ValueError:
         print(f"Image {file} doesn't have Alpha channel")
